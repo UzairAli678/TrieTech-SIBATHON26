@@ -1,0 +1,201 @@
+/* Custom CSS for Travel Budget Planner */
+
+/* Main container styling */
+.main {
+    padding: 2rem;
+}
+
+/* Header styling */
+h1 {
+    color: #1f77b4;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    color: #34495e;
+    font-weight: 500;
+}
+
+/* Card styling */
+.stMetric {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Button styling */
+.stButton>button {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.stButton>button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Input field styling */
+.stTextInput>div>div>input,
+.stNumberInput>div>div>input,
+.stSelectbox>div>div>select {
+    border-radius: 0.5rem;
+    border: 1px solid #ddd;
+}
+
+/* Info box styling */
+.stInfo {
+    background-color: #e7f3ff;
+    border-left: 4px solid #1f77b4;
+    padding: 1rem;
+    border-radius: 0.3rem;
+}
+
+.stSuccess {
+    background-color: #d4edda;
+    border-left: 4px solid #28a745;
+    padding: 1rem;
+    border-radius: 0.3rem;
+}
+
+.stWarning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 1rem;
+    border-radius: 0.3rem;
+}
+
+.stError {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+    padding: 1rem;
+    border-radius: 0.3rem;
+}
+
+/* Sidebar styling */
+.css-1d391kg {
+    background-color: #f8f9fa;
+}
+
+/* Table styling */
+.dataframe {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Chart container */
+.js-plotly-plot {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Expander styling */
+.streamlit-expanderHeader {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
+/* Tab styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 0.5rem;
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+/* Chat message styling */
+.stChatMessage {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Divider styling */
+hr {
+    margin: 2rem 0;
+    border: none;
+    border-top: 2px solid #e0e0e0;
+}
+
+/* Custom metric styling */
+.metric-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Animation for loading */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* Print styles */
+@media print {
+    .stButton,
+    .stTextInput,
+    .stNumberInput,
+    .stSelectbox {
+        display: none;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .main {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.25rem;
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
