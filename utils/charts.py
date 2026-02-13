@@ -9,113 +9,108 @@ from typing import Dict, List
 import pandas as pd
 
 
-def create_pie_chart(
-    data: Dict[str, float],
-    title: str = "Budget Distribution",
-    hole_size: float = 0.4
-):
+def create_budget_pie_chart(breakdown: Dict[str, float], currency: str = "USD") -> go.Figure:
     """
-    Create a pie chart from budget data
+    Create pie chart for budget breakdown
     
     Args:
-        data: Dictionary of categories and amounts
-        title: Chart title
-        hole_size: Size of center hole (0 for regular pie, >0 for donut)
+        breakdown: Dictionary with Hotel, Food, Transport amounts
+        currency: Currency symbol
         
     Returns:
         Plotly figure
     """
-    # Filter out zero values
-    filtered_data = {k: v for k, v in data.items() if v > 0}
+    labels = list(breakdown.keys())
+    values = list(breakdown.values())
     
-    if not filtered_data:
-        return None
-    
-    fig = px.pie(
-        values=list(filtered_data.values()),
-        names=list(filtered_data.keys()),
-        title=title,
-        hole=hole_size,
-        color_discrete_sequence=px.colors.qualitative.Set3
-    )
-    
-    fig.update_traces(
+    fig = go.Figure(data=[go.Pie(
+        labels=labels,
+        values=values,
+        hole=0.4,
+        marker=dict(colors=['#667eea', '#764ba2', '#f093fb']),
         textposition='inside',
-        textinfo='percent+label',
-        hovertemplate='<b>%{label}</b><br>Amount: %{value:,.2f}<br>Percentage: %{percent}<extra></extra>'
-    )
+        textinfo='label+percent',
+        hovertemplate='<b>%{label}</b><br>Amount: ' + currency + ' %{value:,.2f}<br>Percentage: %{percent}<extra></extra>'
+    )])
     
     fig.update_layout(
+        title={
+            'text': 'Cost Breakdown by Category',
+            'x': 0.5,
+            'xanchor': 'center',
+            'font': {'size': 20, 'color': '#333'}
+        },
         showlegend=True,
-        height=500
+        height=500,
+        margin=dict(t=80, b=40, l=40, r=40)
     )
     
     return fig
 
 
-def create_bar_chart(
-    data: Dict[str, float],
-    title: str = "Budget by Category",
-    orientation: str = 'h',
-    color_scale: str = 'Blues'
-):
+def create_daily_vs_total_chart(
+    breakdown: Dict[str, float],
+    days: int,
+    currency: str = "USD"
+) -> go.Figure:
     """
-    Create a bar chart from budget data
+    Create bar chart comparing daily vs total costs
     
     Args:
-        data: Dictionary of categories and amounts
-        title: Chart title
-        orientation: 'h' for horizontal, 'v' for vertical
-        color_scale: Color scale name
+        breakdown: Dictionary with Hotel, Food, Transport amounts
+        days: Number of days
+        currency: Currency symbol
         
     Returns:
         Plotly figure
     """
-    df = pd.DataFrame({
-        'Category': list(data.keys()),
-        'Amount': list(data.values())
-    })
+    categories = list(breakdown.keys())
+    total_costs = list(breakdown.values())
+    daily_costs = [cost / days for cost in total_costs]
     
-    # Filter and sort
-    df = df[df['Amount'] > 0].sort_values('Amount', ascending=(orientation == 'h'))
+    fig = go.Figure()
     
-    if df.empty:
-        return None
+    fig.add_trace(go.Bar(
+        name='Daily Cost',
+        x=categories,
+        y=daily_costs,
+        marker_color='#667eea',
+        text=[f'{currency} {val:,.2f}' for val in daily_costs],
+        textposition='outside',
+        hovertemplate='<b>%{x}</b><br>Daily: ' + currency + ' %{y:,.2f}<extra></extra>'
+    ))
     
-    if orientation == 'h':
-        fig = px.bar(
-            df,
-            x='Amount',
-            y='Category',
-            orientation='h',
-            title=title,
-            color='Amount',
-            color_continuous_scale=color_scale,
-            text='Amount'
-        )
-        fig.update_traces(
-            texttemplate='$%{text:,.2f}',
-            textposition='outside'
-        )
-    else:
-        fig = px.bar(
-            df,
-            x='Category',
-            y='Amount',
-            title=title,
-            color='Amount',
-            color_continuous_scale=color_scale,
-            text='Amount'
-        )
-        fig.update_traces(
-            texttemplate='$%{text:,.2f}',
-            textposition='outside'
-        )
-        fig.update_xaxes(tickangle=-45)
+    fig.add_trace(go.Bar(
+        name='Total Cost',
+        x=categories,
+        y=total_costs,
+        marker_color='#764ba2',
+        text=[f'{currency} {val:,.2f}' for val in total_costs],
+        textposition='outside',
+        hovertemplate='<b>%{x}</b><br>Total: ' + currency + ' %{y:,.2f}<extra></extra>'
+    ))
     
     fig.update_layout(
-        showlegend=False,
-        height=500
+        title={
+            'text': 'Daily vs Total Cost Comparison',
+            'x': 0.5,
+            'xanchor': 'center',
+            'font': {'size': 20, 'color': '#333'}
+        },
+        xaxis_title='Category',
+        yaxis_title=f'Amount ({currency})',
+        barmode='group',
+        height=500,
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        margin=dict(t=100, b=60, l=60, r=40),
+        hovermode='x unified'
     )
     
     return fig

@@ -92,6 +92,14 @@ if st.button("🧮 Calculate Budget", type="primary", use_container_width=True):
         transport_per_day=transport_per_day
     )
     
+    # Save to session state for dashboard
+    st.session_state.budget_result = result
+    st.session_state.budget_params = {
+        "days": days,
+        "persons": persons,
+        "currency": currency
+    }
+    
     st.success("✅ Budget calculated successfully!")
     
     # Result Card

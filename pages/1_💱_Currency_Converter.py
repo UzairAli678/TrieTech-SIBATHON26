@@ -56,25 +56,16 @@ if st.button("🔄 Convert Currency", type="primary", use_container_width=True):
         if result:
             st.success("✅ Conversion Successful!")
             
-            # Result card
-            st.markdown("""
-                <div style='
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    padding: 30px;
-                    border-radius: 15px;
-                    text-align: center;
-                    color: white;
-                    margin: 20px 0;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                '>
+            # Display converted amount prominently
+            converted_amt = result['converted_amount']
+            
+            # Result card with converted amount
+            st.markdown(f"""
+            <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; border-radius: 15px; text-align: center; color: white; margin: 20px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.2);'>
+                <h1 style='color: white; margin: 0; font-size: 48px; font-weight: bold;'>{converted_amt:,.2f} {to_currency}</h1>
+                <p style='color: rgba(255,255,255,0.9); font-size: 20px; margin-top: 15px;'>{amount:,.2f} {from_currency} =</p>
+            </div>
             """, unsafe_allow_html=True)
-            
-            st.markdown(f"<h1 style='color: white; margin: 0;'>{result['converted_amount']:,.2f} {to_currency}</h1>",
-                       unsafe_allow_html=True)
-            st.markdown(f"<p style='color: rgba(255,255,255,0.9); font-size: 18px;'>{amount:,.2f} {from_currency}</p>",
-                       unsafe_allow_html=True)
-            
-            st.markdown("</div>", unsafe_allow_html=True)
             
             # Exchange rate details
             col_a, col_b, col_c = st.columns(3)

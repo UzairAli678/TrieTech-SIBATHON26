@@ -28,6 +28,7 @@ THEME_CONFIG = {
 # API Keys
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 MAP_API_KEY = os.getenv("MAP_API_KEY", "")
+EXCHANGERATE_API_KEY = os.getenv("EXCHANGERATE_API_KEY", "")  # Add your exchangerate.host API key here
 
 # Application Settings
 APP_ENV = os.getenv("APP_ENV", "development")

@@ -6,8 +6,13 @@ Handles real-time exchange rates and currency operations
 import requests
 from typing import Dict, List, Optional
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 API_BASE_URL = "https://api.exchangerate.host"
+API_KEY = os.getenv("EXCHANGERATE_API_KEY", "")  # Your exchangerate.host API key
 
 
 def get_supported_currencies() -> List[str]:
@@ -61,15 +66,23 @@ def convert_currency(amount: float, from_currency: str, to_currency: str) -> Opt
             "amount": amount
         }
         
+        # Add API key if available
+        if API_KEY:
+            params["access_key"] = API_KEY
+        
         response = requests.get(url, params=params, timeout=10)
         
         if response.status_code == 200:
             data = response.json()
             
             if data.get("success"):
+                converted_amount = data.get("result")
+                # Calculate rate from result
+                rate = converted_amount / amount if amount > 0 else None
+                
                 return {
-                    "converted_amount": data.get("result"),
-                    "rate": data.get("info", {}).get("rate"),
+                    "converted_amount": converted_amount,
+                    "rate": rate,
                     "from": from_currency,
                     "to": to_currency,
                     "date": data.get("date"),
