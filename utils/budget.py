@@ -3,37 +3,75 @@ Budget calculation utilities
 Handles trip budget planning and calculations
 """
 
-from typing import Dict, List, Optional
-from datetime import datetime, timedelta
+from typing import Dict
+
+
+def calculate_trip_budget(
+    days: int,
+    persons: int,
+    hotel_per_day: float,
+    food_per_day: float,
+    transport_per_day: float
+) -> Dict:
+    """
+    Calculate trip budget with breakdown
+    
+    Args:
+        days: Number of days
+        persons: Number of persons
+        hotel_per_day: Hotel cost per day
+        food_per_day: Food cost per day per person
+        transport_per_day: Transport cost per day
+        
+    Returns:
+        Dictionary with total_cost, per_person_cost, and breakdown
+    """
+    hotel_total = hotel_per_day * days
+    food_total = food_per_day * days * persons
+    transport_total = transport_per_day * days
+    
+    total_cost = hotel_total + food_total + transport_total
+    per_person_cost = total_cost / persons if persons > 0 else 0
+    
+    breakdown = {
+        "Hotel": hotel_total,
+        "Food": food_total,
+        "Transport": transport_total
+    }
+    
+    return {
+        "total_cost": total_cost,
+        "per_person_cost": per_person_cost,
+        "breakdown": breakdown
+    }
+
+
+def get_breakdown_percentage(breakdown: Dict[str, float], total: float) -> Dict[str, float]:
+    """
+    Calculate percentage for each category
+    
+    Args:
+        breakdown: Dictionary with category amounts
+        total: Total amount
+        
+    Returns:
+        Dictionary with category percentages
+    """
+    if total == 0:
+        return {k: 0 for k in breakdown.keys()}
+    
+    return {k: (v / total * 100) for k, v in breakdown.items()}
 
 
 def calculate_daily_budget(total_budget: float, num_days: int) -> float:
-    """
-    Calculate daily budget from total budget
-    
-    Args:
-        total_budget: Total trip budget
-        num_days: Number of days
-        
-    Returns:
-        Daily budget amount
-    """
+    """Calculate daily budget from total budget"""
     if num_days <= 0:
         return 0.0
     return total_budget / num_days
 
 
 def calculate_per_person_budget(total_budget: float, num_travelers: int) -> float:
-    """
-    Calculate per person budget
-    
-    Args:
-        total_budget: Total trip budget
-        num_travelers: Number of travelers
-        
-    Returns:
-        Per person budget amount
-    """
+    """Calculate per person budget"""
     if num_travelers <= 0:
         return 0.0
     return total_budget / num_travelers

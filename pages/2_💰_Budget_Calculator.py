@@ -5,170 +5,210 @@ Plan and calculate your trip budget
 
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
-from utils.budget import calculate_daily_budget, estimate_trip_cost, get_budget_breakdown
-from config.settings import DEFAULT_BUDGET_CATEGORIES
+from utils.budget import calculate_trip_budget, get_breakdown_percentage
 
 st.set_page_config(page_title="Budget Calculator", page_icon="💰", layout="wide")
 
 st.title("💰 Trip Budget Calculator")
-st.markdown("Plan your trip expenses and stay within budget")
+st.markdown("Calculate your trip expenses with detailed breakdown")
+st.markdown("---")
 
-# Initialize session state
-if "budget_data" not in st.session_state:
-    st.session_state.budget_data = {cat: 0.0 for cat in DEFAULT_BUDGET_CATEGORIES}
+# Input Section
+st.header("📋 Trip Details")
 
-# Trip Information
-st.header("🗓️ Trip Details")
-
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 
 with col1:
-    destination = st.text_input("Destination", placeholder="e.g., Paris, France")
+    days = st.number_input(
+        "Number of Days",
+        min_value=1,
+        value=7,
+        step=1,
+        help="Total duration of your trip"
+    )
+    
+    persons = st.number_input(
+        "Number of Persons",
+        min_value=1,
+        value=2,
+        step=1,
+        help="Total number of travelers"
+    )
 
 with col2:
-    start_date = st.date_input("Start Date", value=datetime.now())
-
-with col3:
-    end_date = st.date_input("End Date", value=datetime.now() + timedelta(days=7))
-
-col4, col5 = st.columns(2)
-
-with col4:
-    num_travelers = st.number_input("Number of Travelers", min_value=1, value=1, step=1)
-
-with col5:
-    currency = st.selectbox("Budget Currency", ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "INR"])
-
-# Calculate trip duration
-if end_date >= start_date:
-    trip_duration = (end_date - start_date).days + 1
-    st.info(f"Trip Duration: **{trip_duration} days** | Travelers: **{num_travelers}**")
-else:
-    st.error("End date must be after start date!")
-    trip_duration = 0
+    currency = st.selectbox(
+        "Currency",
+        ["USD", "EUR", "GBP", "JPY", "AUD", "CAD", "INR", "SGD"],
+        index=0
+    )
 
 st.markdown("---")
 
-# Budget Categories
-st.header("💵 Budget Breakdown")
+# Cost Inputs
+st.header("💵 Daily Expenses")
 
-st.markdown("### Enter your estimated expenses for each category:")
+col_a, col_b, col_c = st.columns(3)
 
-# Create two columns for budget input
-col_left, col_right = st.columns(2)
+with col_a:
+    hotel_per_day = st.number_input(
+        "Hotel per Day",
+        min_value=0.0,
+        value=100.0,
+        step=10.0,
+        format="%.2f",
+        help="Total hotel cost per day"
+    )
 
-categories_left = DEFAULT_BUDGET_CATEGORIES[:4]
-categories_right = DEFAULT_BUDGET_CATEGORIES[4:]
+with col_b:
+    food_per_day = st.number_input(
+        "Food per Person per Day",
+        min_value=0.0,
+        value=50.0,
+        step=5.0,
+        format="%.2f",
+        help="Food cost per person per day"
+    )
 
-with col_left:
-    for category in categories_left:
-        st.session_state.budget_data[category] = st.number_input(
-            f"{category}",
-            min_value=0.0,
-            value=st.session_state.budget_data.get(category, 0.0),
-            step=50.0,
-            key=f"budget_{category}"
-        )
+with col_c:
+    transport_per_day = st.number_input(
+        "Transport per Day",
+        min_value=0.0,
+        value=30.0,
+        step=5.0,
+        format="%.2f",
+        help="Total transport cost per day"
+    )
 
-with col_right:
-    for category in categories_right:
-        st.session_state.budget_data[category] = st.number_input(
-            f"{category}",
-            min_value=0.0,
-            value=st.session_state.budget_data.get(category, 0.0),
-            step=50.0,
-            key=f"budget_{category}"
-        )
+st.markdown("<br>", unsafe_allow_html=True)
 
-# Calculate totals
-total_budget = sum(st.session_state.budget_data.values())
-total_per_person = total_budget / num_travelers if num_travelers > 0 else 0
-daily_budget = total_budget / trip_duration if trip_duration > 0 else 0
-
-st.markdown("---")
-
-# Budget Summary
-st.header("📊 Budget Summary")
-
-metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
-
-with metric_col1:
-    st.metric("Total Budget", f"{currency} {total_budget:,.2f}")
-
-with metric_col2:
-    st.metric("Per Person", f"{currency} {total_per_person:,.2f}")
-
-with metric_col3:
-    st.metric("Daily Budget", f"{currency} {daily_budget:,.2f}")
-
-with metric_col4:
-    st.metric("Per Person/Day", f"{currency} {daily_budget/num_travelers if num_travelers > 0 else 0:,.2f}")
-
-# Budget breakdown table
-st.subheader("Category Breakdown")
-
-breakdown_data = []
-for category, amount in st.session_state.budget_data.items():
-    if total_budget > 0:
-        percentage = (amount / total_budget) * 100
-    else:
-        percentage = 0
+# Calculate Button
+if st.button("🧮 Calculate Budget", type="primary", use_container_width=True):
     
-    breakdown_data.append({
-        "Category": category,
-        "Amount": f"{currency} {amount:,.2f}",
-        "Percentage": f"{percentage:.1f}%",
-        "Daily": f"{currency} {amount/trip_duration if trip_duration > 0 else 0:,.2f}"
-    })
-
-df_breakdown = pd.DataFrame(breakdown_data)
-st.dataframe(df_breakdown, use_container_width=True, hide_index=True)
-
-st.markdown("---")
-
-# Tips and Recommendations
-st.header("💡 Budget Tips")
-
-col_tip1, col_tip2 = st.columns(2)
-
-with col_tip1:
-    st.markdown("""
-    ### 🎯 Smart Budgeting
-    - Add 15-20% buffer for emergencies
-    - Research average costs for your destination
-    - Book accommodation and flights in advance
-    - Use public transportation when possible
-    """)
-
-with col_tip2:
-    st.markdown("""
-    ### 💳 Money-Saving Tips
-    - Compare prices across multiple platforms
-    - Look for free attractions and activities
-    - Eat at local restaurants
-    - Travel during off-peak seasons
-    """)
-
-# Export budget
-st.markdown("---")
-if st.button("📥 Export Budget Plan", type="primary"):
-    export_data = {
-        "Trip Information": {
-            "Destination": destination,
-            "Start Date": start_date.strftime("%Y-%m-%d"),
-            "End Date": end_date.strftime("%Y-%m-%d"),
-            "Duration": f"{trip_duration} days",
-            "Travelers": num_travelers,
-            "Currency": currency
-        },
-        "Budget Summary": {
-            "Total": total_budget,
-            "Per Person": total_per_person,
-            "Daily": daily_budget
-        },
-        "Categories": st.session_state.budget_data
-    }
+    result = calculate_trip_budget(
+        days=days,
+        persons=persons,
+        hotel_per_day=hotel_per_day,
+        food_per_day=food_per_day,
+        transport_per_day=transport_per_day
+    )
     
-    st.json(export_data)
-    st.success("✅ Budget plan ready! You can copy the JSON above.")
+    st.success("✅ Budget calculated successfully!")
+    
+    # Result Card
+    st.markdown("""
+        <div style='
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        '>
+    """, unsafe_allow_html=True)
+    
+    st.markdown(
+        f"<h1 style='color: white; margin: 0;'>{currency} {result['total_cost']:,.2f}</h1>",
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f"<p style='color: rgba(255,255,255,0.9); font-size: 18px;'>Total Trip Cost</p>",
+        unsafe_allow_html=True
+    )
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Metrics
+    st.markdown("### 📊 Summary")
+    
+    metric_col1, metric_col2, metric_col3 = st.columns(3)
+    
+    with metric_col1:
+        st.metric(
+            label="Total Cost",
+            value=f"{currency} {result['total_cost']:,.2f}"
+        )
+    
+    with metric_col2:
+        st.metric(
+            label="Per Person Cost",
+            value=f"{currency} {result['per_person_cost']:,.2f}"
+        )
+    
+    with metric_col3:
+        daily_cost = result['total_cost'] / days
+        st.metric(
+            label="Daily Cost",
+            value=f"{currency} {daily_cost:,.2f}"
+        )
+    
+    st.markdown("---")
+    
+    # Breakdown Table
+    st.subheader("💳 Cost Breakdown")
+    
+    breakdown = result['breakdown']
+    percentages = get_breakdown_percentage(breakdown, result['total_cost'])
+    
+    breakdown_data = []
+    for category in breakdown.keys():
+        breakdown_data.append({
+            "Category": category,
+            "Amount": f"{currency} {breakdown[category]:,.2f}",
+            "Percentage": f"{percentages[category]:.1f}%",
+            "Per Day": f"{currency} {breakdown[category]/days:,.2f}",
+            "Per Person": f"{currency} {breakdown[category]/persons:,.2f}"
+        })
+    
+    df = pd.DataFrame(breakdown_data)
+    
+    st.dataframe(
+        df,
+        use_container_width=True,
+        hide_index=True
+    )
+    
+    st.markdown("---")
+    
+    # Additional Info
+    col_info1, col_info2 = st.columns(2)
+    
+    with col_info1:
+        st.info(f"""
+        **Trip Summary:**
+        - Duration: {days} days
+        - Travelers: {persons} person(s)
+        - Daily budget per person: {currency} {daily_cost/persons:,.2f}
+        """)
+    
+    with col_info2:
+        st.warning(f"""
+        **Recommendations:**
+        - Add 15-20% buffer for emergencies
+        - Emergency fund: ~{currency} {result['total_cost']*0.15:,.2f}
+        - Total with buffer: ~{currency} {result['total_cost']*1.15:,.2f}
+        """)
+
+st.markdown("---")
+
+# Tips Section
+with st.expander("💡 Budget Planning Tips"):
+    col_t1, col_t2 = st.columns(2)
+    
+    with col_t1:
+        st.markdown("""
+        **Before You Travel:**
+        - Research average costs for your destination
+        - Book flights and hotels in advance
+        - Check for travel deals and discounts
+        - Set up travel alerts for price drops
+        """)
+    
+    with col_t2:
+        st.markdown("""
+        **Money Saving Tips:**
+        - Travel during off-peak seasons
+        - Use public transportation
+        - Eat at local restaurants
+        - Look for free attractions and activities
+        """)
