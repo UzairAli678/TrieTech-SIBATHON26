@@ -151,5 +151,23 @@
     "lifestyle": "Luxury",
     "total_cost": 645406.39086,
     "currency": "PKR"
+  },
+  {
+    "timestamp": "2026-02-14T12:57:57.420936",
+    "country": "Pakistan",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Luxury",
+    "total_cost": 796001.2153939999,
+    "currency": "PKR"
+  },
+  {
+    "timestamp": "2026-02-14T13:06:39.711686",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Standard",
+    "total_cost": 3080.0,
+    "currency": "USD"
   }
 ]

@@ -1,5 +1,5 @@
 """
-TriEtech Travel Intelligence Dashboard
+Smart Travel Budget Companion by TriEtech
 Professional AI-powered travel planning and budgeting platform
 """
 
@@ -8,7 +8,7 @@ from config.settings import PAGE_CONFIG, THEME_CONFIG
 
 # Page configuration
 st.set_page_config(
-    page_title="TriEtech Travel Dashboard",
+    page_title="Smart Travel Budget Companion by TriEtech",
     page_icon="🧳",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -391,8 +391,8 @@ def main():
     # Hero Section
     st.markdown("""
     <div class="hero-section">
-        <h1 class="hero-title">TriEtech Travel Intelligence</h1>
-        <p class="hero-subtitle">Enterprise-Grade Travel Planning & Budgeting Platform</p>
+        <h1 class="hero-title">Smart Travel Budget Companion</h1>
+        <p class="hero-subtitle">Enterprise-Grade Travel Planning & Budgeting Platform by TriEtech</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -400,7 +400,7 @@ def main():
     st.markdown("""
     <div class="premium-card">
         <h2 style='margin-top: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
-            Welcome to TriEtech Platform
+            Welcome to Smart Travel Budget Companion
         </h2>
         <p style='font-size: 1.1rem; line-height: 1.8;'>
             Experience the next generation of travel planning with our AI-powered intelligence platform. 
