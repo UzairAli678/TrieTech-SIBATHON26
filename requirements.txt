@@ -20,7 +20,7 @@ streamlit-folium>=0.18.0
 geopy>=2.4.0
 
 # AI/LLM Integration
-openai>=1.12.0
+groq>=0.4.0
 
 # Utilities
 pytz>=2024.1

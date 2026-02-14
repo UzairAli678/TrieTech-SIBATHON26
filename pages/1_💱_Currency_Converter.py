@@ -8,6 +8,126 @@ from utils.currency import get_supported_currencies, get_currency_name, convert_
 
 st.set_page_config(page_title="Currency Converter", page_icon="💱", layout="wide")
 
+# Initialize theme from main app
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+
+# Dynamic theming
+theme = st.session_state.theme
+if theme == "dark":
+    bg_color = "#0E1117"
+    secondary_bg = "#1E2530"
+    card_bg = "#262C3A"
+    text_color = "#FFFFFF"
+    text_secondary = "#B0B8C5"
+    border_color = "#3A4052"
+    shadow = "rgba(0, 0, 0, 0.5)"
+    hover_bg = "#323847"
+else:
+    bg_color = "#FFFFFF"
+    secondary_bg = "#F7F9FC"
+    card_bg = "#FFFFFF"
+    text_color = "#1A202C"
+    text_secondary = "#4A5568"
+    border_color = "#E2E8F0"
+    shadow = "rgba(0, 0, 0, 0.1)"
+    hover_bg = "#EDF2F7"
+
+# Premium CSS
+st.markdown(f"""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    * {{
+        font-family: 'Inter', sans-serif;
+    }}
+    
+    .stApp {{
+        background: {bg_color};
+        color: {text_color};
+    }}
+    
+    h1, h2, h3 {{
+        color: {text_color};
+        font-weight: 700;
+    }}
+    
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {{
+        background: {secondary_bg};
+        border-right: 1px solid {border_color};
+    }}
+    
+    [data-testid="stSidebar"] * {{
+        color: {text_color} !important;
+    }}
+    
+    /* Header Styling */
+    header[data-testid="stHeader"] {{
+        background: {secondary_bg};
+        border-bottom: 1px solid {border_color};
+    }}
+    
+    /* Cards */
+    .stAlert {{
+        background: {card_bg};
+        border: 1px solid {border_color};
+        border-radius: 12px;
+    }}
+    
+    /* Buttons */
+    div.stButton > button {{
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    }}
+    
+    div.stButton > button:hover {{
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+    }}
+    
+    /* Hide Main Menu */
+    #MainMenu {{visibility: hidden;}}
+    
+    /* Footer */
+    footer {{
+        visibility: visible !important;
+        background: {secondary_bg};
+        border-top: 1px solid {border_color};
+        padding: 1.5rem 0;
+        margin-top: 3rem;
+    }}
+    
+    footer * {{
+        color: {text_secondary} !important;
+    }}
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {{
+        width: 10px;
+    }}
+    
+    ::-webkit-scrollbar-track {{
+        background: {secondary_bg};
+    }}
+    
+    ::-webkit-scrollbar-thumb {{
+        background: #667eea;
+        border-radius: 5px;
+    }}
+    
+    ::-webkit-scrollbar-thumb:hover {{
+        background: #764ba2;
+    }}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("💱 Currency Converter")
 st.markdown("Real-time exchange rates powered by exchangerate.host API")
 st.markdown("---")

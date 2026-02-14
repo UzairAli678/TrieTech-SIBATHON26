@@ -1,0 +1,155 @@
+[
+  {
+    "timestamp": "2026-02-14T10:07:01.399833",
+    "country": "United Kingdom",
+    "travelers": 3,
+    "days": 7,
+    "lifestyle": "Budget",
+    "total_cost": 1309.0,
+    "currency": "GBP"
+  },
+  {
+    "timestamp": "2026-02-14T10:07:46.295657",
+    "country": "Pakistan",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Luxury",
+    "total_cost": 1578.5,
+    "currency": "PKR"
+  },
+  {
+    "timestamp": "2026-02-14T10:12:26.415841",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Standard",
+    "total_cost": 3080.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T10:13:19.202436",
+    "country": "Pakistan",
+    "travelers": 4,
+    "days": 7,
+    "lifestyle": "Luxury",
+    "total_cost": 1011885.793919,
+    "currency": "PKR"
+  },
+  {
+    "timestamp": "2026-02-14T10:14:20.440249",
+    "country": "United States",
+    "travelers": 5,
+    "days": 6,
+    "lifestyle": "Budget",
+    "total_cost": 2013.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T10:15:00.214726",
+    "country": "United States",
+    "travelers": 5,
+    "days": 6,
+    "lifestyle": "Standard",
+    "total_cost": 3828.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T10:15:16.114191",
+    "country": "United States",
+    "travelers": 5,
+    "days": 6,
+    "lifestyle": "Luxury",
+    "total_cost": 8448.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T10:21:00.391004",
+    "country": "Japan",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Luxury",
+    "total_cost": 1085162.82336,
+    "currency": "JPY"
+  },
+  {
+    "timestamp": "2026-02-14T10:21:39.121052",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Budget",
+    "total_cost": 1540.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T11:24:28.186093",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Standard",
+    "total_cost": 3080.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T12:02:41.048890",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Luxury",
+    "total_cost": 7084.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T12:22:44.791432",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Luxury",
+    "total_cost": 7084.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T12:38:22.158190",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Budget",
+    "total_cost": 1540.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T12:40:02.356377",
+    "country": "United States",
+    "travelers": 3,
+    "days": 5,
+    "lifestyle": "Budget",
+    "total_cost": 1292.5,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T12:40:18.688246",
+    "country": "United States",
+    "travelers": 3,
+    "days": 5,
+    "lifestyle": "Standard",
+    "total_cost": 2530.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T12:40:28.470084",
+    "country": "United States",
+    "travelers": 3,
+    "days": 5,
+    "lifestyle": "Luxury",
+    "total_cost": 5720.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-14T12:40:40.992527",
+    "country": "Pakistan",
+    "travelers": 3,
+    "days": 5,
+    "lifestyle": "Luxury",
+    "total_cost": 645406.39086,
+    "currency": "PKR"
+  }
+]

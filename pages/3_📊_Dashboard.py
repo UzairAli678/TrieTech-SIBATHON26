@@ -8,6 +8,126 @@ from utils.charts import create_budget_pie_chart, create_daily_vs_total_chart
 
 st.set_page_config(page_title="Dashboard", page_icon="📊", layout="wide")
 
+# Initialize theme from main app
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+
+# Dynamic theming
+theme = st.session_state.theme
+if theme == "dark":
+    bg_color = "#0E1117"
+    secondary_bg = "#1E2530"
+    card_bg = "#262C3A"
+    text_color = "#FFFFFF"
+    text_secondary = "#B0B8C5"
+    border_color = "#3A4052"
+    shadow = "rgba(0, 0, 0, 0.5)"
+    hover_bg = "#323847"
+else:
+    bg_color = "#FFFFFF"
+    secondary_bg = "#F7F9FC"
+    card_bg = "#FFFFFF"
+    text_color = "#1A202C"
+    text_secondary = "#4A5568"
+    border_color = "#E2E8F0"
+    shadow = "rgba(0, 0, 0, 0.1)"
+    hover_bg = "#EDF2F7"
+
+# Premium CSS
+st.markdown(f"""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    * {{
+        font-family: 'Inter', sans-serif;
+    }}
+    
+    .stApp {{
+        background: {bg_color};
+        color: {text_color};
+    }}
+    
+    h1, h2, h3 {{
+        color: {text_color};
+        font-weight: 700;
+    }}
+    
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {{
+        background: {secondary_bg};
+        border-right: 1px solid {border_color};
+    }}
+    
+    [data-testid="stSidebar"] * {{
+        color: {text_color} !important;
+    }}
+    
+    /* Header Styling */
+    header[data-testid="stHeader"] {{
+        background: {secondary_bg};
+        border-bottom: 1px solid {border_color};
+    }}
+    
+    /* Cards */
+    .stAlert {{
+        background: {card_bg};
+        border: 1px solid {border_color};
+        border-radius: 12px;
+    }}
+    
+    /* Buttons */
+    div.stButton > button {{
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    }}
+    
+    div.stButton > button:hover {{
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+    }}
+    
+    /* Hide Main Menu */
+    #MainMenu {{visibility: hidden;}}
+    
+    /* Footer */
+    footer {{
+        visibility: visible !important;
+        background: {secondary_bg};
+        border-top: 1px solid {border_color};
+        padding: 1.5rem 0;
+        margin-top: 3rem;
+    }}
+    
+    footer * {{
+        color: {text_secondary} !important;
+    }}
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {{
+        width: 10px;
+    }}
+    
+    ::-webkit-scrollbar-track {{
+        background: {secondary_bg};
+    }}
+    
+    ::-webkit-scrollbar-thumb {{
+        background: #667eea;
+        border-radius: 5px;
+    }}
+    
+    ::-webkit-scrollbar-thumb:hover {{
+        background: #764ba2;
+    }}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("📊 Budget Analytics Dashboard")
 st.markdown("Visualize your travel budget with interactive charts")
 st.markdown("---")
@@ -20,18 +140,22 @@ if "budget_result" not in st.session_state:
     # Show sample data option
     if st.button("📊 View Sample Dashboard"):
         st.session_state.budget_result = {
-            "total_cost": 2240.0,
-            "per_person_cost": 1120.0,
+            "total_cost": 4500.0,
+            "per_person_cost": 2250.0,
             "breakdown": {
-                "Hotel": 700.0,
-                "Food": 700.0,
-                "Transport": 210.0
+                "Accommodation": 1400.0,
+                "Food & Dining": 1200.0,
+                "Transportation": 700.0,
+                "Activities": 900.0,
+                "Miscellaneous": 300.0
             }
         }
         st.session_state.budget_params = {
             "days": 7,
             "persons": 2,
-            "currency": "USD"
+            "currency": "USD",
+            "country": "Sample Country",
+            "lifestyle": "Standard"
         }
         st.rerun()
     st.stop()
@@ -49,6 +173,17 @@ currency = params["currency"]
 
 # Summary Cards
 st.header("💰 Budget Summary")
+
+# Display country and lifestyle if available
+if params.get("country") or params.get("lifestyle"):
+    info_parts = []
+    if params.get("country"):
+        info_parts.append(f"📍 **Destination:** {params['country']}")
+    if params.get("lifestyle"):
+        info_parts.append(f"✨ **Travel Style:** {params['lifestyle']}")
+    
+    st.markdown(" | ".join(info_parts))
+    st.markdown("")
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -152,20 +287,30 @@ with col_insight1:
 with col_insight2:
     st.markdown("### ✅ Recommendations")
     
-    # Generate smart recommendations
-    hotel_pct = (breakdown["Hotel"] / total_cost * 100) if total_cost > 0 else 0
-    food_pct = (breakdown["Food"] / total_cost * 100) if total_cost > 0 else 0
+    # Generate smart recommendations - handle both old and new breakdown formats
+    # Old format: "Hotel", "Food", "Transport"
+    # New format: "Accommodation", "Food & Dining", "Transportation"
+    
+    hotel_cost = breakdown.get("Accommodation", breakdown.get("Hotel", 0))
+    food_cost = breakdown.get("Food & Dining", breakdown.get("Food", 0))
+    transport_cost = breakdown.get("Transportation", breakdown.get("Transport", 0))
+    
+    hotel_pct = (hotel_cost / total_cost * 100) if total_cost > 0 else 0
+    food_pct = (food_cost / total_cost * 100) if total_cost > 0 else 0
     
     recommendations = []
     
     if hotel_pct > 40:
-        recommendations.append("Consider alternative accommodation to reduce hotel costs")
+        recommendations.append("Consider alternative accommodation to reduce costs")
     
     if food_pct > 40:
         recommendations.append("Look for local markets and budget-friendly restaurants")
     
     if daily_cost > 200:
         recommendations.append("Daily cost is high - consider off-peak travel dates")
+    
+    if total_cost > 5000:
+        recommendations.append("High budget trip - consider travel insurance and payment protection")
     
     if not recommendations:
         recommendations = [

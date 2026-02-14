@@ -4,6 +4,7 @@ Handles map creation and location services
 """
 
 import folium
+import requests
 from typing import Dict, List, Tuple, Optional
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
@@ -104,6 +105,121 @@ def reverse_geocode(lat: float, lon: float) -> Optional[str]:
         pass
     
     return None
+
+
+def get_places(city: str, api_key: str) -> Optional[Dict]:
+    """
+    Fetch tourist places from Geoapify Places API with enhanced data
+    
+    Args:
+        city: City name to search
+        api_key: Geoapify API key
+        
+    Returns:
+        Dict with center coordinates and list of places
+    """
+    import random
+    
+    if not api_key:
+        return None
+        
+    try:
+        # First, geocode the city to get coordinates
+        geocode_url = "https://api.geoapify.com/v1/geocode/search"
+        geocode_params = {
+            "text": city,
+            "apiKey": api_key,
+            "limit": 1
+        }
+        
+        geo_response = requests.get(geocode_url, params=geocode_params, timeout=30)
+        
+        if geo_response.status_code != 200:
+            return None
+            
+        geo_data = geo_response.json()
+        
+        if not geo_data.get("features"):
+            return None
+            
+        coordinates = geo_data["features"][0]["geometry"]["coordinates"]
+        lon, lat = coordinates[0], coordinates[1]
+        
+        # Fetch places with larger radius and limit
+        places_url = "https://api.geoapify.com/v2/places"
+        places_params = {
+            "categories": "tourism,heritage,entertainment.museum,tourism.attraction,tourism.sights,entertainment.culture",
+            "filter": f"circle:{lon},{lat},10000",
+            "limit": 40,
+            "apiKey": api_key
+        }
+        
+        places_response = requests.get(places_url, params=places_params, timeout=30)
+        
+        if places_response.status_code != 200:
+            return None
+            
+        places_data = places_response.json()
+        
+        if not places_data.get("features"):
+            return {"center": [lat, lon], "places": []}
+            
+        # Parse places
+        all_places = []
+        seen_names = set()
+        
+        for feature in places_data["features"]:
+            props = feature.get("properties", {})
+            coords = feature.get("geometry", {}).get("coordinates", [0, 0])
+            name = props.get("name", "Unknown Place")
+            
+            # Remove duplicates
+            if name in seen_names:
+                continue
+            seen_names.add(name)
+            
+            categories = props.get("categories", ["tourism"])
+            main_category = categories[0] if categories else "tourism"
+            
+            # Prioritize tourism categories
+            is_tourism = "tourism" in main_category or "attraction" in main_category
+            
+            place = {
+                "name": name,
+                "lat": coords[1],
+                "lon": coords[0],
+                "address": props.get("formatted", "Address not available"),
+                "category": main_category,
+                "description": props.get("description", ""),
+                "website": props.get("datasource", {}).get("raw", {}).get("website", ""),
+                "priority": 1 if is_tourism else 0
+            }
+            all_places.append(place)
+        
+        # Sort by priority and randomly select 20
+        all_places.sort(key=lambda x: x["priority"], reverse=True)
+        tourism_places = [p for p in all_places if p["priority"] == 1]
+        other_places = [p for p in all_places if p["priority"] == 0]
+        
+        # Take up to 15 tourism places and up to 5 others
+        selected = tourism_places[:15] + other_places[:5]
+        
+        # If we have more than 20, randomly sample
+        if len(selected) > 20:
+            selected = random.sample(selected, 20)
+        
+        # Remove priority field from final result
+        for place in selected:
+            place.pop("priority", None)
+            
+        return {
+            "center": [lat, lon],
+            "places": selected
+        }
+        
+    except Exception as e:
+        print(f"Error fetching places: {e}")
+        return None
 
 
 def search_attractions(

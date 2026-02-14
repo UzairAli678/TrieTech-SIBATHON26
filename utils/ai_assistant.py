@@ -1,268 +1,147 @@
 """
-AI Assistant utilities
-Handles chatbot functionality and AI responses
+AI Assistant utilities - Groq API Integration
+Handles chatbot functionality and AI responses for tourist assistance
+Uses Groq's ultra-fast LLM API with Llama models
 """
 
 import os
-from typing import List, Dict
-from config.settings import AI_MODEL, AI_TEMPERATURE, AI_MAX_TOKENS, OPENAI_API_KEY
+from typing import List, Dict, Optional
+from dotenv import load_dotenv
+from groq import Groq
+
+load_dotenv()
+
+# Get Groq API key from environment
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+
+# Initialize Groq client
+client = None
+if GROQ_API_KEY:
+    client = Groq(api_key=GROQ_API_KEY)
 
 
-def initialize_conversation() -> List[Dict]:
+def get_system_prompt(country: Optional[str] = None, language: str = "English") -> str:
     """
-    Initialize conversation with system prompt
+    Generate system prompt for the AI assistant
     
-    Returns:
-        List with system message
-    """
-    system_message = {
-        "role": "system",
-        "content": """You are a helpful travel planning assistant. You provide advice on:
-        - Travel destinations and recommendations
-        - Budget planning and money-saving tips
-        - Best times to visit locations
-        - Local customs, culture, and etiquette
-        - Packing tips and travel essentials
-        - Safety and health advice
-        - Transportation and accommodation suggestions
-        - Food and dining recommendations
+    Args:
+        country: Selected country for context
+        language: Response language
         
-        Keep responses concise, practical, and friendly. Provide specific examples when possible.
-        If you don't know something, admit it and suggest reliable resources."""
-    }
-    
-    return [system_message]
-
-
-def get_ai_response(user_message: str, chat_history: List[Dict]) -> str:
+    Returns:
+        System prompt string
     """
-    Get AI response to user message
+    country_context = f"\n\nCurrent Context: The user is interested in {country}. Provide answers specifically related to {country} when relevant." if country else ""
+    
+    language_instruction = f"\n\nIMPORTANT: Respond in {language} language. All your responses must be in {language}."
+    
+    return f"""You are a professional multilingual tourist assistant named "TravelBot". Your job is to guide travelers around the world with expertise and warmth.
+
+Your capabilities:
+- Provide detailed travel advice for any country or city
+- Recommend tourist attractions (famous landmarks AND hidden gems)
+- Suggest hotels and accommodations for different budgets
+- Recommend local cuisine and best restaurants
+- Provide budget planning and money-saving tips
+- Share safety tips and travel precautions
+- Explain local customs, culture, and etiquette
+- Suggest best times to visit and seasonal activities
+- Help with visa requirements and travel documentation
+- Provide transportation tips (flights, trains, local transport)
+- Recommend shopping areas and local markets
+- Share photography spots and scenic viewpoints
+
+Response Style:
+- Be friendly, warm, and enthusiastic
+- Provide specific, actionable advice
+- Use emojis appropriately to make responses engaging
+- Give multiple options when possible (budget/mid-range/luxury)
+- Include practical tips and insider knowledge
+- If unsure, admit it and suggest reliable resources{country_context}{language_instruction}"""
+
+
+def get_ai_response(user_message: str, country: Optional[str] = None, language: str = "English", chat_history: Optional[List[Dict]] = None) -> str:
+    """
+    Get AI response using Groq API (Llama 3.1 70B)
     
     Args:
         user_message: User's message
-        chat_history: Previous conversation history
+        country: Selected country for context (optional)
+        language: Response language (default: English)
+        chat_history: Previous conversation history (optional)
         
     Returns:
         AI response text
     """
-    # Check if OpenAI API key is available
-    if not OPENAI_API_KEY or OPENAI_API_KEY == "":
-        return get_fallback_response(user_message)
+    # Check if Groq client is available
+    if not client:
+        return get_fallback_response(user_message, language)
     
     try:
-        from openai import OpenAI
+        # Build conversation context
+        system_prompt = get_system_prompt(country, language)
         
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        # Build messages for Groq chat completion
+        messages = [
+            {"role": "system", "content": system_prompt}
+        ]
         
-        # Prepare messages for API
-        messages = initialize_conversation()
+        # Add chat history if available (last 6 messages for context)
+        if chat_history and len(chat_history) > 0:
+            recent_history = chat_history[-6:] if len(chat_history) > 6 else chat_history
+            for msg in recent_history:
+                if msg['role'] in ['user', 'assistant']:
+                    messages.append({
+                        "role": msg['role'],
+                        "content": msg['content']
+                    })
         
-        # Add relevant history (last 10 messages to stay within token limits)
-        recent_history = chat_history[-10:] if len(chat_history) > 10 else chat_history
+        # Add current user message
+        messages.append({"role": "user", "content": user_message})
         
-        for msg in recent_history:
-            if msg["role"] in ["user", "assistant"]:
-                messages.append({
-                    "role": msg["role"],
-                    "content": msg["content"]
-                })
-        
-        # Add current message
-        messages.append({
-            "role": "user",
-            "content": user_message
-        })
-        
-        # Get response from OpenAI
+        # Generate response using Groq API
         response = client.chat.completions.create(
-            model=AI_MODEL,
+            model="llama-3.3-70b-versatile",
             messages=messages,
-            temperature=AI_TEMPERATURE,
-            max_tokens=AI_MAX_TOKENS
+            temperature=0.7,
+            max_tokens=2000,
+            top_p=0.9,
+            stream=False
         )
         
         return response.choices[0].message.content
         
     except Exception as e:
-        return get_fallback_response(user_message)
+        print(f"Groq API Error: {str(e)}")
+        return get_fallback_response(user_message, language)
 
 
-def get_fallback_response(user_message: str) -> str:
+def get_fallback_response(user_message: str, language: str = "English") -> str:
     """
     Provide fallback responses when AI is unavailable
     
     Args:
         user_message: User's message
+        language: Response language
         
     Returns:
         Fallback response
     """
-    user_message_lower = user_message.lower()
     
-    # Budget-related questions
-    if any(word in user_message_lower for word in ["budget", "cost", "expensive", "cheap", "price"]):
-        return """💰 **Budget Travel Tips:**
-
-- Research average costs for your destination in advance
-- Book flights and accommodation 2-3 months ahead
-- Travel during off-peak seasons (20-40% savings)
-- Use public transportation instead of taxis
-- Eat at local restaurants away from tourist areas
-- Look for free walking tours and attractions
-- Consider hostels or Airbnb for accommodation
-- Set a daily spending limit and track expenses
-
-Would you like specific budget estimates for a particular destination?"""
+    # Language-specific error messages
+    error_messages = {
+        "English": "⚠️ **AI Assistant Unavailable**\n\nThe AI assistant requires a valid Groq API key. Please add your GROQ_API_KEY to the .env file.\n\nGet your free API key at: https://console.groq.com/keys",
+        "Urdu": "⚠️ **AI اسسٹنٹ دستیاب نہیں**\n\nAI اسسٹنٹ کو Groq API کلید کی ضرورت ہے۔ براہ کرم اپنی GROQ_API_KEY کو .env فائل میں شامل کریں۔",
+        "Arabic": "⚠️ **مساعد الذكاء الاصطناعي غير متاح**\n\nيتطلب مساعد الذكاء الاصطناعي مفتاح Groq API صالحًا. يرجى إضافة GROQ_API_KEY إلى ملف .env",
+        "French": "⚠️ **Assistant IA indisponible**\n\nL'assistant IA nécessite une clé API Groq valide. Veuillez ajouter votre GROQ_API_KEY au fichier .env",
+        "Spanish": "⚠️ **Asistente de IA no disponible**\n\nEl asistente de IA requiere una clave API de Groq válida. Agregue su GROQ_API_KEY al archivo .env",
+        "Chinese": "⚠️ **AI助手不可用**\n\nAI助手需要有效的Groq API密钥。请将您的GROQ_API_KEY添加到.env文件中"
+    }
     
-    # Destination recommendations
-    elif any(word in user_message_lower for word in ["where", "recommend", "destination", "visit", "travel to"]):
-        return """🌍 **Popular Travel Destinations by Interest:**
+    return error_messages.get(language, error_messages["English"])
 
-**Culture & History:**
-- Rome, Italy - Ancient ruins and Renaissance art
-- Kyoto, Japan - Traditional temples and gardens
-- Cairo, Egypt - Pyramids and ancient wonders
 
-**Nature & Adventure:**
-- New Zealand - Hiking, mountains, scenic beauty
-- Costa Rica - Rainforests and wildlife
-- Iceland - Volcanoes, waterfalls, northern lights
-
-**Beach & Relaxation:**
-- Maldives - Luxury resorts and crystal waters
-- Bali, Indonesia - Beaches, culture, affordable
-- Greek Islands - Beautiful scenery and history
-
-What type of experience are you looking for?"""
-    
-    # Packing tips
-    elif any(word in user_message_lower for word in ["pack", "luggage", "bring", "carry"]):
-        return """🎒 **Smart Packing Tips:**
-
-**Essentials:**
-- Passport, visas, copies of important documents
-- Credit cards and some local currency
-- Travel insurance documents
-- Necessary medications
-- Universal power adapter
-- Phone charger and power bank
-
-**Clothing Tips:**
-- Mix-and-match versatile pieces
-- Layer for different weather
-- 1-2 pairs of comfortable shoes
-- Quick-dry fabrics
-- One dressy outfit
-
-**Space Savers:**
-- Roll clothes instead of folding
-- Use packing cubes
-- Wear bulkiest items on travel day
-- Bring travel-size toiletries
-
-Check weather forecast before finalizing your packing list!"""
-    
-    # Safety tips
-    elif any(word in user_message_lower for word in ["safe", "safety", "danger", "security"]):
-        return """🛡️ **Travel Safety Tips:**
-
-**Before You Go:**
-- Research your destination's safety situation
-- Register with your embassy
-- Get travel insurance
-- Make copies of important documents
-
-**While Traveling:**
-- Stay aware of your surroundings
-- Don't display expensive items
-- Use hotel safes for valuables
-- Keep emergency contacts handy
-- Avoid walking alone at night in unfamiliar areas
-- Trust your instincts
-
-**Money Safety:**
-- Use ATMs in secure locations
-- Don't carry all cash in one place
-- Notify your bank of travel plans
-- Use credit cards when possible
-
-Stay safe and enjoy your trip!"""
-    
-    # Best time to visit
-    elif any(word in user_message_lower for word in ["when", "time", "season", "weather"]):
-        return """📅 **Choosing the Best Travel Time:**
-
-**Consider These Factors:**
-
-**Weather:**
-- Check seasonal climate patterns
-- Avoid extreme temperatures or monsoon seasons
-- Consider your weather preferences
-
-**Crowds:**
-- Peak season = More crowds, higher prices
-- Shoulder season = Better balance
-- Off-season = Cheaper but some closures
-
-**Events:**
-- Festivals and local celebrations
-- Holidays (may affect prices/availability)
-- Special events you want to attend
-
-**Budget:**
-- Off-peak = 20-40% savings
-- Book flights on Tuesdays/Wednesdays
-- Travel mid-week when possible
-
-Which destination are you interested in?"""
-    
-    # Food and dining
-    elif any(word in user_message_lower for word in ["food", "eat", "restaurant", "cuisine"]):
-        return """🍽️ **Food & Dining Travel Tips:**
-
-**Eating Smart:**
-- Try local street food (usually authentic and cheap)
-- Ask locals for restaurant recommendations
-- Eat where locals eat, not tourist traps
-- Learn basic food phrases in local language
-- Be adventurous but know your limits
-
-**Budget Tips:**
-- Lunch menus often cheaper than dinner
-- Markets for fresh, affordable food
-- Stay in places with kitchen facilities
-- Carry snacks for cheaper options
-
-**Food Safety:**
-- Choose busy restaurants (high turnover)
-- Drink bottled water if advised
-- Be careful with raw foods in some regions
-- Keep hand sanitizer handy
-
-**Cultural Etiquette:**
-- Research tipping customs
-- Learn basic dining manners
-- Respect dietary restrictions/customs
-
-Happy eating! 🌮🍜🍕"""
-    
-    # Default response
-    else:
-        return """🤖 **I'm here to help with your travel planning!**
-
-I can assist you with:
-
-✈️ **Destination Recommendations** - Where to go based on your interests
-💰 **Budget Planning** - How to plan and save money
-🎒 **Packing Tips** - What to bring for your trip
-📅 **Best Times to Visit** - When to travel to avoid crowds
-🛡️ **Safety Advice** - How to stay safe abroad
-🍽️ **Food & Dining** - Where and what to eat
-🗺️ **Itinerary Planning** - How to organize your trip
-
-**Note:** For this demo, I'm providing general advice. For personalized AI responses, please add your OpenAI API key to the .env file.
-
-What aspect of travel planning can I help you with?"""
+# Keep the existing analyze_budget_input function if it exists below
 
 
 def analyze_budget_input(budget_data: Dict) -> str:
