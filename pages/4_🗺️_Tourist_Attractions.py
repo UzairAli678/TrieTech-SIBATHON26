@@ -7,13 +7,10 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import requests
-import os
-from dotenv import load_dotenv
+from config.secrets_manager import GEOAPIFY_API_KEY
 from utils.budget import fetch_countries
 from folium.plugins import MarkerCluster, Fullscreen, MiniMap
 import time
-
-load_dotenv()
 
 st.set_page_config(page_title="TriEtech Tourist Attractions", page_icon="🗺️", layout="wide")
 
@@ -247,10 +244,10 @@ if st.session_state.countries_list is None:
         st.session_state.countries_list = fetch_countries()
 
 countries = st.session_state.countries_list
-api_key = os.getenv("GEOAPIFY_API_KEY", "")
+api_key = GEOAPIFY_API_KEY  # Uses secrets_manager (works for both local and cloud)
 
 if not api_key:
-    st.error("⚠️ Geoapify API key not found. Add GEOAPIFY_API_KEY to .env file.")
+    st.error("⚠️ Geoapify API key not found. Add GEOAPIFY_API_KEY to .env file or Streamlit secrets.")
     st.stop()
 
 # Two-column layout

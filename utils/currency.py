@@ -6,13 +6,10 @@ Handles real-time exchange rates and currency operations
 import requests
 from typing import Dict, List, Optional
 from datetime import datetime
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from config.secrets_manager import EXCHANGERATE_API_KEY
 
 API_BASE_URL = "https://api.exchangerate.host"
-API_KEY = os.getenv("EXCHANGERATE_API_KEY", "")  # Your exchangerate.host API key
+API_KEY = EXCHANGERATE_API_KEY  # Works for both local and cloud
 
 
 def get_supported_currencies() -> List[str]:

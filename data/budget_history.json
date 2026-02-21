@@ -250,5 +250,77 @@
     "lifestyle": "Luxury",
     "total_cost": 5720.0,
     "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-15T20:48:58.037459",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Standard",
+    "total_cost": 3080.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-16T10:25:36.643016",
+    "country": "United States",
+    "travelers": 3,
+    "days": 5,
+    "lifestyle": "Budget",
+    "total_cost": 1292.5,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-16T10:26:03.501350",
+    "country": "United States",
+    "travelers": 3,
+    "days": 5,
+    "lifestyle": "Luxury",
+    "total_cost": 5720.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-16T10:26:40.109752",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Standard",
+    "total_cost": 3080.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-16T10:32:48.751335",
+    "country": "United States",
+    "travelers": 3,
+    "days": 5,
+    "lifestyle": "Standard",
+    "total_cost": 2530.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-18T19:07:22.628628",
+    "country": "United States",
+    "travelers": 3,
+    "days": 5,
+    "lifestyle": "Budget",
+    "total_cost": 1292.5,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-18T19:08:21.333855",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Luxury",
+    "total_cost": 7084.0,
+    "currency": "USD"
+  },
+  {
+    "timestamp": "2026-02-21T13:25:45.982364",
+    "country": "United States",
+    "travelers": 2,
+    "days": 7,
+    "lifestyle": "Standard",
+    "total_cost": 3080.0,
+    "currency": "USD"
   }
 ]

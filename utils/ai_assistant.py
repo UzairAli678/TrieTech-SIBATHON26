@@ -4,17 +4,11 @@ Handles chatbot functionality and AI responses for tourist assistance
 Uses Groq's ultra-fast LLM API with Llama models
 """
 
-import os
 from typing import List, Dict, Optional
-from dotenv import load_dotenv
+from config.secrets_manager import GROQ_API_KEY
 from groq import Groq
 
-load_dotenv()
-
-# Get Groq API key from environment
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-
-# Initialize Groq client
+# Get Groq API key from secrets manager (works for both local and cloud)
 client = None
 if GROQ_API_KEY:
     client = Groq(api_key=GROQ_API_KEY)

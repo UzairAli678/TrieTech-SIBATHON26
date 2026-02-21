@@ -2,7 +2,6 @@
 Smart Travel Budget Companion by TriEtech
 Professional AI-powered travel planning and budgeting platform
 """
-
 import streamlit as st
 from config.settings import PAGE_CONFIG, THEME_CONFIG
 

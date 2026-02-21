@@ -2,11 +2,17 @@
 Application Configuration Settings
 """
 
-import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+from config.secrets_manager import (
+    EXCHANGERATE_API_KEY,
+    GEOAPIFY_API_KEY,
+    GEMINI_API_KEY,
+    GROQ_API_KEY,
+    OPENAI_API_KEY,
+    MAP_API_KEY,
+    APP_ENV,
+    DEBUG,
+    DATABASE_URL
+)
 
 # Page Configuration
 PAGE_CONFIG = {
@@ -25,17 +31,8 @@ THEME_CONFIG = {
     "font": "sans serif"
 }
 
-# API Keys
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-MAP_API_KEY = os.getenv("MAP_API_KEY", "")
-EXCHANGERATE_API_KEY = os.getenv("EXCHANGERATE_API_KEY", "")  # Add your exchangerate.host API key here
-
-# Application Settings
-APP_ENV = os.getenv("APP_ENV", "development")
-DEBUG = os.getenv("DEBUG", "True") == "True"
-
-# Database Configuration (Optional)
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///data/travel_planner.db")
+# Export API Keys (already imported from secrets_manager)
+# These will work for both local (.env) and cloud (st.secrets)
 
 # Currency API Settings
 CURRENCY_API_FALLBACK = "https://api.exchangerate-api.com/v4/latest/"
